@@ -1,0 +1,28 @@
+version: "3"
+services:
+  node:
+    container_name: express
+    build: ./app
+    volumes:
+      - ./app:/app
+    tty:  true
+    ports:
+      - 3100:3100
+    depends_on:
+      - postgres
+
+  postgres:
+    container_name: postgres
+    image: postgres:12
+    ports:
+      - 5200:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: wallet_db
+    volumes:
+      - db_data:/var/lib/posrgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+
+volumes:
+  db_data: {}
