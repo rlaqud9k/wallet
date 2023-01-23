@@ -1,23 +1,30 @@
 import { pool } from '../index'
 import { Request, Response } from 'express'
 import { QueryResult } from 'pg'
+import { errorHandler, responseHandler } from '../handler'
 
 const sellQuery = 'UPDATE wallets SET balance = balance - ABS($2) WHERE user_id = $1 RETURNING *'
 const buyQuery = 'UPDATE wallets SET balance = balance + $2 WHERE user_id = $1 RETURNING *'
+
+//負数入力禁止
+const amountValidationCheck = (amount: number, res: Response) => {
+  if (amount <= 0) return errorHandler(Error('Invalid coin amount'), res)
+}
 
 //取引が発生したときpostgresqlのtriggerで取引記録が生成される
 //指定した分を残高から引く
 export const sell = (req: Request, res: Response) => {
   const { id, amount } = req.body
+
   const values = [id, amount]
-  //負数入力禁止
-  if (amount <= 0) return res.status(500).json({ message: 'Invalid coin amount' })
+
+  amountValidationCheck(amount, res)
 
   pool.query(sellQuery, values, (err: Error, result: QueryResult) => {
     if (err) {
-      res.status(500).json({ message: err.message })
+      return errorHandler(Error(err.message), res)
     } else {
-      res.status(200).json({ data: { balance: result.rows[0] } })
+      return responseHandler({ balance: result.rows[0] }, res)
     }
   })
 }
@@ -26,14 +33,14 @@ export const sell = (req: Request, res: Response) => {
 export const buy = (req: Request, res: Response) => {
   const { id, amount } = req.body
   const values = [id, amount]
-  //負数入力禁止
-  if (amount <= 0) return res.status(500).json({ message: 'Invalid coin amount' })
+
+  amountValidationCheck(amount, res)
 
   pool.query(buyQuery, values, (err: Error, result: QueryResult) => {
     if (err) {
-      res.status(500).json({ message: err.message })
+      return errorHandler(Error(err.message), res)
     } else {
-      res.status(200).json({ data: { balance: result.rows[0] } })
+      return responseHandler({ balance: result.rows[0] }, res)
     }
   })
 }
@@ -42,8 +49,7 @@ export const buy = (req: Request, res: Response) => {
 export const send = (req: Request, res: Response) => {
   const { id, amount, takerId } = req.body
 
-  //負数入力禁止
-  if (amount <= 0) return res.status(500).json({ message: 'Invalid coin amount' })
+  amountValidationCheck(amount, res)
 
   pool.connect((err, client, done) => {
     //何らかの不具合が発生したときrollbackする
@@ -58,7 +64,7 @@ export const send = (req: Request, res: Response) => {
           done()
         })
       }
-      return res.status(500).json({ message: [err.message, ...errors] })
+      return errorHandler(Error([err.message, ...errors].toString()), res)
     }
 
     client.query('BEGIN', (err) => {
@@ -69,13 +75,10 @@ export const send = (req: Request, res: Response) => {
           if (err) return shouldAbort(err, res)
           client.query('COMMIT', (err, result) => {
             if (err) {
-              res.status(500).json({ message: 'Error committing transaction' })
+              errorHandler(Error('Error committing transaction'), res)
             }
             done()
-            console.log(sendResult.rows, takeResult.rows)
-            res
-              .status(200)
-              .json({ data: { sender: sendResult.rows[0], taker: takeResult.rows[0] } })
+            return responseHandler({ sender: sendResult.rows[0], taker: takeResult.rows[0] }, res)
           })
         })
       })
