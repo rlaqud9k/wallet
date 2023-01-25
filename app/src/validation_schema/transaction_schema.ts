@@ -1,5 +1,13 @@
 import { checkSchema } from 'express-validator'
 
+const amountValidationCheck = (value: number) => {
+  if (value > 0) {
+    return true
+  } else {
+    throw new Error('Invalid amount')
+  }
+}
+
 export const sellBuyRequestCheckSchema = checkSchema({
   id: {
     isUUID: true,
@@ -7,7 +15,10 @@ export const sellBuyRequestCheckSchema = checkSchema({
   },
   amount: {
     isNumeric: true,
-    exists: true
+    exists: true,
+    custom: {
+      options: amountValidationCheck
+    }
   }
 })
 
@@ -18,7 +29,10 @@ export const sendRequestCheckSchema = checkSchema({
   },
   amount: {
     isNumeric: true,
-    exists: true
+    exists: true,
+    custom: {
+      options: amountValidationCheck
+    }
   },
   takerId: {
     isUUID: true,

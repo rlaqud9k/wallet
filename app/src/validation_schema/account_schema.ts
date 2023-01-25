@@ -11,7 +11,16 @@ export const signUpRequestCheckSchema = checkSchema({
   },
   age: {
     isInt: true,
-    exists: true
+    exists: true,
+    custom: {
+      options: (value) => {
+        if (value >= 0) {
+          return true
+        } else {
+          throw new Error('Invalid age')
+        }
+      }
+    }
   },
   gender: {
     isBoolean: true,
