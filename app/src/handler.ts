@@ -5,7 +5,6 @@ export const errorHandler = (err: any, res: Response) => {
   //express-validatorエラー処理
   //express-validatorエラー以外はErrorオブジェクトを使う
   if (err?.errors) {
-    console.log(err.errors)
     err.message = err.errors.map(({ value, msg, param }: ValidationError) => {
       return `param: ${param} value: ${value} message: ${msg}`
     })
