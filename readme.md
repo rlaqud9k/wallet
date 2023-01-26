@@ -18,7 +18,7 @@ docker-compose up
 
 |                                | メソッド | URI               |
 | ------------------------------ | -------- | ----------------- |
-| ユーザー情報登録               | POSTT    | /account/sign-up  |
+| ユーザー情報登録               | POST    | /account/sign-up  |
 | ユーザーの残高・取引記録取得   | POST     | /account/info     |
 | 指定した分を残高から引く       | POST     | /transaction/sell |
 | 指定した分を残高から足す       | POST     | /transaction/buy  |
