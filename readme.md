@@ -26,7 +26,7 @@ docker-compose up
 
 ### /account/sign-up
 
-```json
+```
 //BODY:JSON
 {
     "name": string,
@@ -38,7 +38,7 @@ docker-compose up
 
 ### /account/info
 
-```json
+```
 //BODY:JSON
 {
     "id": UUID
@@ -47,7 +47,7 @@ docker-compose up
 
 ### /transaction/sell
 
-```json
+```
 //BODY:JSON
 {
     "id": UUID,
@@ -57,7 +57,7 @@ docker-compose up
 
 ### /transaction/buy
 
-```json
+```
 //BODY:JSON
 {
     "id": UUID,
@@ -67,7 +67,7 @@ docker-compose up
 
 ### /transaction/send
 
-```json
+```
 //BODY:JSON
 {
     "id": UUID,
