@@ -35,8 +35,6 @@ export const info = (req: Request, res: Response) => {
     } else {
       const rows = result.rows
       let transactions: any[] = []
-      //ユーザーidがいない場合のエラー処理
-      if (!rows.length) return errorHandler(Error('user does not exist'), res)
 
       //取引記録がない状態では空いている配列をreturnする
       if (rows[rows.length - 1]?.created_at) {

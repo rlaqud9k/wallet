@@ -1,5 +1,6 @@
 import express, { Router } from 'express'
 import { Pool } from 'pg'
+import { errorHandler } from './handler'
 
 //express-app
 const app: express.Express = express()
@@ -27,6 +28,5 @@ app.use('/account', require('./controller/account_controller'))
 app.use('/transaction', require('./controller/transaction_controller'))
 //404エラー処理
 app.use((req, res, next) => {
-  res.status(404)
-  res.end('not founded! :' + req.path)
+  errorHandler(Error('not founded! :' + req.path), res)
 })

@@ -7,6 +7,7 @@ import {
   signUpRequestCheckSchema,
   infoRequestCheckSchema
 } from '../validation_schema/account_schema'
+import { checkExistUser } from '../interceptor/auth_interceptor'
 
 //エラーになったときにエラー範囲を特定しやすくするためasync/awaitではなくcallback処理にする
 //ユーザーのIDは送信・照会の主な情報のため簡単な情報でもgetではなくpostを使う
@@ -21,7 +22,7 @@ router.post('/sign-up', signUpRequestCheckSchema, (req: Request, res: Response) 
   }
 })
 
-router.post('/info', infoRequestCheckSchema, (req: Request, res: Response) => {
+router.post('/info', checkExistUser, infoRequestCheckSchema, (req: Request, res: Response) => {
   try {
     //パラメーター検証処理
     validationResult(req).throw()

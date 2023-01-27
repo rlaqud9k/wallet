@@ -39,7 +39,7 @@ export const buy = (req: Request, res: Response) => {
 //指定した分を相手に渡す
 export const send = (req: Request, res: Response) => {
   const { id, amount, takerId } = req.body
-
+  if (id === takerId) return errorHandler(Error('Invalid ID: same Id'), res)
   pool.connect((err, client, done) => {
     //何らかの不具合が発生したときrollbackする
     const shouldAbort = (err: Error, res: Response) => {

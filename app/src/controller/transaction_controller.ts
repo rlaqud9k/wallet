@@ -7,10 +7,11 @@ import {
   sellBuyRequestCheckSchema,
   sendRequestCheckSchema
 } from '../validation_schema/transaction_schema'
+import { checkExistUser } from '../interceptor/auth_interceptor'
 
 //エラーになったときにエラー範囲を特定しやすくするためasync/awaitではなくcallback処理にする
 //ユーザーのIDは送信・照会の主な情報のため簡単な情報でもgetではなくpostを使う
-router.post('/sell', sellBuyRequestCheckSchema, (req: Request, res: Response) => {
+router.post('/sell', checkExistUser, sellBuyRequestCheckSchema, (req: Request, res: Response) => {
   try {
     //パラメーター検証処理
     validationResult(req).throw()
@@ -21,7 +22,7 @@ router.post('/sell', sellBuyRequestCheckSchema, (req: Request, res: Response) =>
   }
 })
 
-router.post('/buy', sellBuyRequestCheckSchema, (req: Request, res: Response) => {
+router.post('/buy', checkExistUser, sellBuyRequestCheckSchema, (req: Request, res: Response) => {
   try {
     //パラメーター検証処理
     validationResult(req).throw()
@@ -32,7 +33,7 @@ router.post('/buy', sellBuyRequestCheckSchema, (req: Request, res: Response) => 
   }
 })
 
-router.post('/send', sendRequestCheckSchema, (req: Request, res: Response) => {
+router.post('/send', checkExistUser, sendRequestCheckSchema, (req: Request, res: Response) => {
   try {
     //パラメーター検証処理
     validationResult(req).throw()
