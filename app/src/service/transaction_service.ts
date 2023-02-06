@@ -2,6 +2,7 @@ import { pool } from '../index'
 import { Request, Response } from 'express'
 import { QueryResult } from 'pg'
 import { errorHandler, responseHandler } from '../handler'
+import { SendResponse, SellBuyResponse } from '../type'
 
 const sellQuery = 'UPDATE wallets SET balance = balance - ABS($2) WHERE user_id = $1 RETURNING *'
 const buyQuery = 'UPDATE wallets SET balance = balance + $2 WHERE user_id = $1 RETURNING *'
@@ -17,7 +18,7 @@ export const sell = (req: Request, res: Response) => {
     if (err) {
       return errorHandler(Error(err.message), res)
     } else {
-      return responseHandler({ balance: result.rows[0] }, res)
+      return responseHandler<SellBuyResponse>({ balance: result.rows[0] }, res)
     }
   })
 }
@@ -31,7 +32,7 @@ export const buy = (req: Request, res: Response) => {
     if (err) {
       return errorHandler(Error(err.message), res)
     } else {
-      return responseHandler({ balance: result.rows[0] }, res)
+      return responseHandler<SellBuyResponse>({ balance: result.rows[0] }, res)
     }
   })
 }
@@ -67,7 +68,10 @@ export const send = (req: Request, res: Response) => {
               errorHandler(Error('Error committing transaction'), res)
             }
             done()
-            return responseHandler({ sender: sendResult.rows[0], taker: takeResult.rows[0] }, res)
+            return responseHandler<SendResponse>(
+              { sender: sendResult.rows[0], taker: takeResult.rows[0] },
+              res
+            )
           })
         })
       })

@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import { QueryResult } from 'pg'
 import crypto from 'crypto'
 import { errorHandler, responseHandler } from '../handler'
-
+import { InfoResponse, SignUpResponse, Transaction } from '../type'
 const signUpQuery =
   'INSERT INTO users (id, name, mail, age, gender) VALUES ($1, $2, $3, $4, $5) RETURNING *'
 const infoQuery =
@@ -19,7 +19,7 @@ export const signUp = (req: Request, res: Response) => {
     if (err) {
       return errorHandler(Error(err.message), res)
     } else {
-      return responseHandler({ user: result.rows[0] }, res)
+      return responseHandler<SignUpResponse>({ user: result.rows[0] }, res)
     }
   })
 }
@@ -34,7 +34,7 @@ export const info = (req: Request, res: Response) => {
       return errorHandler(Error(err.message), res)
     } else {
       const rows = result.rows
-      let transactions: any[] = []
+      let transactions: Transaction[] = []
 
       //取引記録がない状態では空いている配列をreturnする
       if (rows[rows.length - 1]?.created_at) {
@@ -43,7 +43,7 @@ export const info = (req: Request, res: Response) => {
         })
       }
 
-      return responseHandler(
+      return responseHandler<InfoResponse>(
         { id: rows[0].id, balance: rows[0].balance, transactions: transactions },
         res
       )
